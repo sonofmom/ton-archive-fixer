@@ -1,8 +1,6 @@
 ## Fixer for TON archival nodes database
 This script will fix databases of archival nodes and inject blocks from 3.7mil to 4.9mil into global index for autoload.
 
-All commands shown in this guide assume that you run node with mytonctrl with default locations, if your locations differ make sure to adjust the commands accordingly.
-
 ### Who needs this
 Anyone who operates TON archival node that does not preload archive files of the blocks mentioned above, to check if your node is affected you can try to access block 4000000 via blockchain explorer, if get error then you need this fixer.
 
@@ -22,8 +20,27 @@ It is very important that you use same version of rocksDB ldb binary as the libr
 A binary of ldb built on `Ubuntu 20.04.2 LTS` is provided with this repository.
 
 ### Preparations
-* Stop your node
+* Stop your validator service
 * Make a backup or ZFS snapshot of node database
 
 ### Fix
-Dump your `globalindex`
+All commands shown in this guide assume that you run node with mytonctrl with default locations, if your locations differ make sure to adjust the commands accordingly.
+
+It is also assumed that you are located in root of this cloned repository.
+
+#### Make a backup copy of globalindex
+```sudo cp -Rp /var/ton-work/db/files/globalindex /var/ton-work/db/files/globalindex.bak```
+
+#### Dump your node `globalindex`
+```./bin/ldb --db=/var/ton-work/db/files/globalindex dump --hex > /tmp/globalindex.dump```
+
+#### Patch the dump
+```./patch_globalindex.py --dump=/tmp/globalindex.dump```
+
+If patch was ok script will return a **SUCCESS** message.
+
+#### Reload `globalindex` from dump
+```cat /tmp/globalindex.dump | ./bin/ldb --db=/var/ton-work/db/files/globalindex load --hex --block_size=65536 --create_if_missing --disable_wal```
+
+### Followup steps
+You can start your validator service now, after start check if the node loads blocks using steps outlined in second chapter of this readme.

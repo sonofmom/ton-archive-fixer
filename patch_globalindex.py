@@ -52,7 +52,7 @@ def run(argv):
             f.write("{}\n".format(line))
         f.close()
 
-    print ("DONE!")
+    print ("SUCCESS")
 
 
 def reverse_word(word):
