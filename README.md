@@ -6,7 +6,9 @@ Anyone who operates TON archival node that does not preload archive files of the
 
 Another way to check if your node needs this fix is to run:
 
-```ls -l /proc/`ps -A -o pid,cmd | grep validator-engine | grep -v grep | head -n 1 | awk '{print $1}'`/fd | grep arch0040 | wc -l```
+```shell
+ls -l /proc/`ps -A -o pid,cmd | grep validator-engine | grep -v grep | head -n 1 | awk '{print $1}'`/fd | grep arch0040 | wc -l
+```
 
 If this returns 0 then your node needs fixing.
 
@@ -29,18 +31,26 @@ All commands shown in this guide assume that you run node with mytonctrl with de
 It is also assumed that you are located in root of this cloned repository.
 
 #### Make a backup copy of globalindex
-```sudo cp -Rp /var/ton-work/db/files/globalindex /var/ton-work/db/files/globalindex.bak```
+```shell
+sudo cp -Rp /var/ton-work/db/files/globalindex /var/ton-work/db/files/globalindex.bak
+```
 
 #### Dump your node `globalindex`
-```./bin/ldb --db=/var/ton-work/db/files/globalindex dump --hex > /tmp/globalindex.dump```
+```shell
+./bin/ldb --db=/var/ton-work/db/files/globalindex dump --hex > /tmp/globalindex.dump
+```
 
 #### Patch the dump
-```./patch_globalindex.py --dump=/tmp/globalindex.dump```
+```shell
+./patch_globalindex.py --dump=/tmp/globalindex.dump
+```
 
 If patch was ok script will return a **SUCCESS** message.
 
 #### Reload `globalindex` from dump
-```cat /tmp/globalindex.dump | ./bin/ldb --db=/var/ton-work/db/files/globalindex load --hex --block_size=65536 --create_if_missing --disable_wal```
+```shell
+cat /tmp/globalindex.dump | ./bin/ldb --db=/var/ton-work/db/files/globalindex load --hex --block_size=65536 --create_if_missing --disable_wal
+```
 
 ### Followup steps
 You can start your validator service now, after start check if the node loads blocks using steps outlined in second chapter of this readme.
